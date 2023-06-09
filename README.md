@@ -53,4 +53,4 @@ learning experience for me on the never-ending path to becoming a better program
 ### What I Would Have Done With More Time
 As previously stated, I chose to split this task into 3 even parts. I would have liked more time to properly research testing (as I had researched pathfinding algorithms) and to create proper try/catch tests (etc) isolating small blocks of code. In particular, considering I found a bug when changing the maze sizes I would have liked to try and isolate this issue through testing. 
 
-Likewise, I did not even attempt to allow for mazes that were not square in shape. Once I would have ironed out bugs with square mazes this would've been the next feature I would've liked to implement. 
+Likewise, I did not even attempt to allow for mazes that were not square in shape. Once I had ensured my code works for rectangular mazes, I would've been the next feature I would've liked to allow for mazes with arrays of differing lengths. 

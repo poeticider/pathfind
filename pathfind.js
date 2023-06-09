@@ -7,7 +7,7 @@ let A = [
     [true, true, true, true, true]
 ];
 
-//vectors with assigned names. vector[0] represents x axis position. vector[1] represents y axis position.
+//vectors with assigned names. vector[0] represents vertical position. vector[1] represents horizontal position.
 //I am replicating P and Q's start positions in the README.md example.
 let P = [0, 1];
 let Q = [3, 2];
@@ -15,8 +15,21 @@ let Q = [3, 2];
 //function to find shortest route in maze
 const pathfind = (maze, startPosition, endPosition) => {
 
-    //mazeVector will be used to create new array represented as a list of numbers
-    //in ascending order from 0 > maze length -1.
+    //logic only currently works for square mazes(ie 5x5). Warnings below check for non-square mazes.
+    if(maze.length !== maze[0].length) {
+        console.log(`WARNING: non-square maze detected.\nFunction may not behave correctly on non-square mazes.\n`);
+
+    } else {
+        maze.forEach((arr) => {
+            if(arr.length !== maze[0].length) {
+                console.log(`WARNING: different array lengths for maze detected.\nFunction may not behave correctly.\n`);
+
+            }
+        
+        });
+    }
+
+    //mazeVector will be used to create new array represented as a list of numbers in ascending order from 0 > maze length -1.
     //this is because .js does not like complex arrays and to simplify maze navigation/manipulation using simple arthimetic.
     let mazeVector = [];
     let mazeEleCounter = 0;
@@ -49,24 +62,34 @@ const pathfind = (maze, startPosition, endPosition) => {
 
     //this function assumes each row of the maze is the same length. Maze row length is stored in the below var.
     //this will be needed to convert start/end position to a single number.
-    const mazeRows = maze[0].length;
-    //this function assumes the maze will always be a square. Regardless I have created a Columns variable for the sake of code readability.
-    const mazeCols = mazeRows;
-    //to be used in line 133
-    const mazeSize = mazeVector.length;
+    const mazeRowLength = maze[0].length;
 
     //start && end position must now be converted to a single numeric value to match their place within the mazeVector array.
 
     //start and end positions are calculated as a single number.
     //first arr number represents x axis(rows) and second arr number represents y axis(columns)
-    //thus position[0] * mazeRows + position[0] will convert the array coordinate into a single number.
-    let startPositionAsNum = startPosition[0] * mazeRows + startPosition[1];
-    let endPositionAsNum = endPosition[0] * mazeRows + endPosition[1];
+    //thus position[0] * mazeRowLength + position[0] will convert the array coordinate into a single number.
+    let startPositionAsNum = startPosition[0] * mazeRowLength + startPosition[1];
+    let endPositionAsNum = endPosition[0] * mazeRowLength + endPosition[1];
 
-    console.log(`The start position in the maze is: ${startPositionAsNum}\n`);
-    console.log(`The end postion in the maze is: ${endPositionAsNum}\n`);
+    //warning message to let you know if given start + end positions are inaccessible tiles. 
+    if(mazeVector[startPositionAsNum] == null || mazeVector[startPositionAsNum] == undefined) {
+        console.log(`WARNING the start position on tile ${startPositionAsNum} is inaccessible.\nPlease try another tile.`);
 
-    //end of code for converting function arguments into (integer-array, integer, integer).
+    } else {
+        console.log(`The start position in the maze is: ${startPositionAsNum}\n`);
+
+    }
+
+    if(mazeVector[endPositionAsNum] == null || mazeVector[endPositionAsNum] == undefined) {
+        console.log(`WARNING the start position on tile ${endPositionAsNum} is inaccessible.\nPlease try another tile.`);
+
+    } else {
+        console.log(`The end postion in the maze is: ${endPositionAsNum}\n`);
+
+    }
+
+    //end of code for converting function parameters into (integer-array, integer, integer).
     //--------------------------------------------------------------------------------
     
     
@@ -93,6 +116,7 @@ const pathfind = (maze, startPosition, endPosition) => {
             //trigger for reaching end destination in maze
             if(current === endPositionAsNum) {
                 return moves[current];
+
             }
         
             //refers to getAdjacentTiles function on line 122.
@@ -104,6 +128,7 @@ const pathfind = (maze, startPosition, endPosition) => {
                     queue.push(tile);
                     visited[tile] = true;
                     moves[tile] = moves[current] + 1;
+
                 }
             }
 
@@ -123,8 +148,8 @@ const pathfind = (maze, startPosition, endPosition) => {
         const adjacentTiles = [];
         //tile starts as start position.
         //maze borders are calculated with arithmetic
-        const topTile = tile - mazeRows; 
-        const bottomTile = tile + mazeRows;
+        const topTile = tile - mazeRowLength; 
+        const bottomTile = tile + mazeRowLength;
         const leftTile = tile - 1; 
         const rightTile = tile + 1;
         
@@ -139,14 +164,12 @@ const pathfind = (maze, startPosition, endPosition) => {
 
         }
 
-        //hard coded modulo 5 !== 4 for 5x5 maze breaking 6x6 maze. Needs dynamic vars
-        if(leftTile % 5 !== 4 && vectorMaze[leftTile] !== null && vectorMaze[leftTile] !== undefined) {
+        if(leftTile % mazeRowLength !== mazeRowLength -1 && vectorMaze[leftTile] !== null && vectorMaze[leftTile] !== undefined) {
             adjacentTiles.push(leftTile);
 
         }
         
-        //hard coded modulo 5 !== 0 for 5x5 maze breaking 6x6 maze. Needs dynamic vars
-        if(rightTile % 5 !== 0 && vectorMaze[rightTile] !== null && vectorMaze[rightTile] !== undefined) {
+        if(rightTile % mazeRowLength !== 0 && vectorMaze[rightTile] !== null && vectorMaze[rightTile] !== undefined) {
             adjacentTiles.push(rightTile);
 
         }
@@ -160,6 +183,7 @@ const pathfind = (maze, startPosition, endPosition) => {
   
     //calling shortestPath function
     const shortestPath = calculateShortestPath(startPositionAsNum, endPositionAsNum, mazeVector);
+
     console.log(`The shortest path from tile ${startPositionAsNum} to tile ${endPositionAsNum} is ${shortestPath} moves.`);
   
 
@@ -171,66 +195,125 @@ const pathfind = (maze, startPosition, endPosition) => {
 
 
 //calling pathfind() with README.md example arguments
-//pathfind(A, P, Q);
-//expected: 6 moves
+pathfind(A, P, Q);
+//expected start position: 1
+//expected end position: 17
+//expected moves: 6
 
-//calling pathfind() with different start/end position
-let testStart1 = [4, 4]
-let testEnd1 = [1, 4]
-// pathfind(A, testStart1, testEnd1);
-//expected: 3 moves
-
-//calling pathfind() with impassible end position
-let testEnd2 = [1, 2]
-//pathfind(A, testStart1, testEnd2);
-//expected: -1 moves
-
-//calling pathfind() with end integer that is not in maze
+//variables for testing-
+let testStart1 = [4, 4];
+let testEnd1 = [1, 4];
+let testEnd2 = [1, 2];
 let testStart3 = [1, 10000];
-//pathfind(A, testStart3, Q);
-//expected: -1 moves
-
-//calling pathfind() with end integer that is not in maze
 let testEnd3 = [1, 10000];
-//pathfind(A, testStart1, testEnd3);
-//expected: -1 moves
+let testStart4 = [2, 5];
+let testEnd4 = [0, 5];
+let testStart5 = [2, 2];
+let testEnd5 = [0, 2];
 
-//calling pathfind with 6x6 maze with same layout as 5x5
-let testMaze1 = [
+let testMaze6x6One = [
     [true, true, true, true, true, true],
     [true, false, false, false, true, true],
     [true, true, true, true, true, true],
     [true, true, true, true, true, true],
     [true, true, true, true, true, true],
     [true, true, true, true, true, true],
-]
+];
 
-pathfind(testMaze1, P, Q);
-//expected: 6 moves
-//stated end position is incorrect.
-//expected end position: 15 actual end position: 20
-
-//calling pathfind with a different 6x6 maze
-let testMaze2 = [
+let testMaze6x6Two = [
     [true, true, true, true, true, true],
     [true, false, false, false, false, false],
     [true, true, true, false, true, true],
     [true, true, true, false, true, true],
     [true, true, true, true, true, true],
     [true, false, false, false, true, false],
-]
+];
 
-let testStart6X6 = [5, 2];
-let testEnd6X6 = [5, 0];
+let testMaze3x3One = [
+    [true, true, true],
+    [true, false, false],
+    [true, true, true],
+];
 
-//pathfind(testMaze2, testStart6X6, testEnd6X6);
-//expected: 16 moves //states 6 moves.
-//expected start position: 17. actual start position: 32
-//expected end position: 5. actual start position: 30
-//maze logic appears to be bugged for non 5x5 mazes 
+let testMaze3x4One = [
+    [true, true, true, true],
+    [true, false, false, true],
+    [true, true, true, true],
+];
 
-//on 143 + 149 hard coded integers were found in arthimatic that I assumed would only work on 5x5 maze.
-//I copied + pasted the code into a new file, to mimic making a fork for editing.
-//after removing hard coded elements I tested again on testMaze1 and found the result to be unchanged.
-//I understand that I must isolate the issue and will do so if time permits.
+let testMazeIrregular = [
+    [true, true, true, true],
+    [true, false, false, true, true],
+    [true, true, true, true],
+];
+
+//----------------------------------------------------------------------
+
+//calling pathfind() with different start/end position
+//pathfind(A, testStart1, testEnd1);
+//expected start position: 24
+//expected end position: 9
+//expected moves: 3
+
+
+//calling pathfind() with impassible end position.
+//pathfind(A, testStart1, testEnd2);
+//expected start position: 24
+//expected end position: 7 (Warning for inaccessible tile)
+//expected moves: -1
+
+
+//calling pathfind() with start integer that is not in maze
+//pathfind(A, testStart3, Q);
+//expected start position: 10005 (Warning for inaccessible tile)
+//expected end position: 17
+//expected moves: -1
+
+
+//calling pathfind() with end integer that is not in maze
+//pathfind(A, testStart1, testEnd3);
+//expected start position: 24 
+//expected end position: 10005 (Warning for inaccessible tile)
+//expected moves: -1
+
+
+//calling pathfind with 6x6 maze with same layout as 5x5
+//pathfind(testMaze6x6One, P, Q);
+//expected start position: 1
+//expected end position: 20
+//expected moves: 6
+
+
+//calling pathfind with a different 6x6 maze
+//pathfind(testMaze6x6Two, testStart4, testEnd4);
+//expected start position: 17
+//expected end position: 5
+//expected moves: 16 
+
+
+//calling pathfind with 3x3 maze
+//pathfind(testMaze3x3One, testStart5, testEnd5);
+//expected start position: 8
+//expected end position: 2
+//expected moves: 6
+
+
+//calling pathfind on non-square mazes.-------------------------------------------------------------
+//Note I did not expect this to work as my current code assumes all mazes are square
+
+//3x4 maze
+//pathfind(testMaze3x4One, testStart5, testEnd5);
+//expected non-square maze warning
+//expected start position: 10
+//expected end position: 2
+//expected moves: 4
+
+
+//calling pathfind on maze with arrays of different lengths
+//pathfind(testMazeIrregular, testStart5, testEnd5);
+//expected irregular arrays warning
+//expected start position: 11. actual position 10
+//expected end position: 2
+//expected moves: 4
+
 
